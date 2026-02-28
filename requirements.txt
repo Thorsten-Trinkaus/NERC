@@ -1,0 +1,9 @@
+datasets
+numpy
+transformers
+evaluate
+accelerate
+sentencepiece
+ipykernel
+jupyter
+ipywidgets
