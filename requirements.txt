@@ -7,3 +7,5 @@ sentencepiece
 ipykernel
 jupyter
 ipywidgets
+protobuf
+grpcio-tools
