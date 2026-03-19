@@ -18,352 +18,341 @@ al., ACL 2018)
 
 # NERC Dataset Analysis – OntoNotes, FIGER, and Ultra-Fine
 
-This subproject focuses on the analysis of datasets used for **Named Entity Recognition and Classification (NERC)** as well as **Fine-Grained Entity Typing**.
+This subproject analyzes three datasets used for **Named Entity Recognition and Classification (NERC)** and **Fine-Grained Entity Typing**.
 
-The goal is to examine the characteristics and challenges of the following datasets:
+The goal is to better understand the **structure, complexity, and label distributions** of the datasets before training models such as **T5** or **NLI-based classifiers**.
+
+Datasets analyzed:
 
 - OntoNotes (Hovy et al., NAACL 2006)
 - FIGER – Fine-Grained Entity Recognition (Ling & Weld, AAAI 2012)
 - Ultra-Fine Entity Typing (Choi et al., ACL 2018)
 
-The analysis focuses on:
+---
 
-- Label granularity  
-- Label distribution  
-- Ambiguous entities  
-- Multi-word entities  
-- Challenges for T5-based models  
-- Challenges for NLI-based approaches  
-- Possible preprocessing strategies  
+# Dataset Overview
+
+| Dataset | Task | Granularity | Multi-Label |
+|-------|------|-------------|-------------|
+| OntoNotes | Classical NER | Coarse | No |
+| FIGER | Fine-Grained Entity Typing | Fine | Yes |
+| Ultra-Fine | Ultra-Fine Entity Typing | Very Fine | Yes |
+
+These datasets represent **three increasing levels of entity typing complexity**.
 
 ---
 
-# Overview of the Datasets
+# Dataset Size Comparison
 
-| Dataset | Task | Granularity | Multi-Label |
-|--------|------|-------------|-------------|
-| [OntoNotes](#ontonotes-dataset) | Classical NER | Coarse | No |
-| [FIGER](#figer-dataset) | Fine-Grained Entity Typing | Fine | Yes |
-| [Ultra-Fine](#ultra-fine-entity-typing-dataset) | Ultra-Fine Entity Typing | Very fine | Yes |
+The datasets differ significantly in size.
 
-These three datasets represent different levels of complexity in entity typing.
+
+| Dataset | diffrent Labels | Multi-Label |
+|---------|-------------|-------------|
+| OntoNotes | 9  | No |
+| FIGER | 128  | Yes |
+| Ultra-Fine | 1639 | Yes |
+
+FIGER contains the largest number of entity mentions, while OntoNotes is smaller but uses structured NER annotations.
+
+---
+
+# Label Space Comparison
+
+The number of distinct labels varies strongly across datasets.
+
+
+
+Observations:
+
+- **OntoNotes** uses a small fixed label set
+- **FIGER** expands this to a larger fine-grained taxonomy
+- **Ultra-Fine** contains a very large and open-ended label space
+
+This increase in label space complexity significantly affects model difficulty.
+
+---
+
+# Labels per Mention
+
+The number of labels assigned to each entity mention differs across datasets.
+
+## Average Labels per Mention
+
+![Average Labels](datasets/Plots/avg_labels_per_mention.png)
+
+Observations:
+
+- OntoNotes is **single-label**
+- FIGER introduces **multi-label classification**
+- Ultra-Fine contains **more descriptive multi-label annotations**
+
+---
+
+## Maximum Labels per Mention
+
+![Max Labels](datasets/Plots/max_labels_per_mention.png)
+
+Ultra-Fine occasionally assigns **many labels to a single entity**, reflecting the dataset's goal of capturing rich semantic descriptions.
 
 ---
 
 # OntoNotes Dataset
 
-The OntoNotes dataset is a well-established benchmark for **classical Named Entity Recognition (NER)**.
+OntoNotes is a benchmark dataset for **classical Named Entity Recognition (NER)**.
 
-### Typical Entity Types
+### Example Labels
 
 - PERSON
-- ORG
-- GPE
 - LOC
-- EVENT
-- PRODUCT
-- LANGUAGE
-- DATE
-- MONEY
-- WORK_OF_ART
+- ORG
 
----
-
-## Label Granularity
-
-OntoNotes uses **coarse-grained labels**, meaning relatively general entity categories.
+Example:
 
 | Entity | Label |
 |------|------|
 | Barack Obama | PERSON |
 | Apple | ORG |
-| Berlin | GPE |
 
-These categories are broad and do not distinguish finer subtypes.
-
-Example issue:
-
-Apple → ORG
-
-However, this could also refer to:
-
-- a company  
-- a brand  
-- a product  
+These labels are **coarse-grained** and mutually exclusive.
 
 ---
 
 ## Label Distribution
 
-The label distribution shows a clear **class imbalance**.
+OntoNotes shows a strong **class imbalance**.
 
-Frequent classes:
+Most frequent classes include:
 
-- PERSON  
-- ORG  
-- GPE  
+- PERSON
+- ORG
+- GPE
 
-Rare classes:
+Rare classes include:
 
-- EVENT  
-- LAW  
-- LANGUAGE  
+- CITY
+- COUNTRY
 
 This imbalance can affect model performance.
 
----
+![OntoNotes Top Labels](datasets/Plots/ontonotes_top10_labels.png)
 
-## Ambiguous Entities
-
-An example is:
-
-Amazon
-
-Possible meanings:
-
-- ORG (company)  
-- LOC (river)  
-- GPE (region)
-
-The correct classification strongly depends on the context.
-
----
-
-## Multi-Word Entities
-
-The dataset contains many **multi-token entities**.
-
-Examples:
-
-- New York City  
-- Bank of America  
-- United Nations  
-
-Models therefore need to detect **contiguous token spans**.
+Compared to FIGER and Ultra-Fine, OntoNotes has a **much more compact label distribution**.
 
 ---
 
 # FIGER Dataset
 
-The FIGER dataset extends NER to **fine-grained entity typing**.
+FIGER extends classical NER to **fine-grained entity typing**.
 
-### Number of Types
+Instead of broad categories like *PERSON*, FIGER introduces hierarchical labels such as:
 
-Approximately **112 different entity types**.
+- `/person/actor`
+- `/person/politician`
+- `/location/city`
+- `/organization/company`
 
-Examples:
 
-- /person/actor  
-- /person/politician  
-- /location/city  
-- /organization/company  
-- /organization/sports_team  
+## Top Labels in FIGER
 
----
+The most frequent labels in the dataset are shown below.
 
-## Label Granularity
+![FIGER Top Labels](datasets//Plots/figer_top10_labels.png)
 
-Example:
+Common entity types include:
 
-Entity: Barack Obama
+- person
+- organization
+- location
 
-Possible labels:
-
-- person  
-- politician  
-- president  
-- author  
-
-This creates a **hierarchical structure of labels**.
-
----
-
-## Multi-Label Problem
-
-An entity can have **multiple types simultaneously**.
-
-Example:
-
-Elon Musk
-
-Labels:
-
-- person  
-- entrepreneur  
-- engineer  
-- businessman  
-
----
-
-## Label Distribution
-
-FIGER also exhibits **strong class imbalance**.
-
-Frequent:
-
-- person  
-- organization  
-- location  
-
-Rare:
-
-- person/skateboarder  
-- person/cartoonist  
-
----
-
-## Multi-Word Entities
-
-Examples:
-
-- Los Angeles Lakers  
-- United States of America  
-- New York Stock Exchange  
+The dataset exhibits a **long-tail distribution**, where many labels occur only rarely.
 
 ---
 
 # Ultra-Fine Entity Typing Dataset
 
-This dataset extends entity typing to **extremely fine-grained categories**.
+The Ultra-Fine dataset pushes entity typing further by allowing **very specific semantic descriptions**.
 
-Labels are often **free-form natural language descriptions**.
+Examples of labels:
 
-Examples:
+- person
+- musician
+- politician
+- father
+- skyscraper
 
-- person  
-- father  
-- songwriter  
-- politician  
-- skyscraper  
-
----
-
-## Label Granularity
-
-An entity can have labels at multiple levels of specificity.
-
-Example:
-
-Trump
-
-Possible labels:
-
-- person  
-- businessman  
-- president  
-- politician  
-- celebrity  
+Labels are often **natural language descriptions** instead of fixed ontology entries.
 
 ---
 
-## Label Distribution
+## Top Labels in Ultra-Fine
 
-Many labels appear **only a few times in the dataset**, resulting in a **long-tail distribution**.
+![Ultra-Fine Top Labels](datasets/Plots/ultrafine_top10_labels.png)
 
----
+The label distribution shows a strong **long-tail behavior**.
 
-# Challenges for T5
-
-T5 is a **generative sequence-to-sequence model**.
-
-Challenges for NERC tasks include:
-
-- multiple labels per entity  
-- structured output requirements  
-- open label vocabularies (especially in Ultra-Fine)
-
-Example output:
-
-Barack Obama → person, politician, president
-
-The model must therefore generate **multiple correct labels simultaneously**.
+Many labels appear only a few times.
 
 ---
 
-# Challenges for NLI-Based Approaches
 
-In NLI-based approaches, entity typing is formulated as a **textual inference problem**.
+# Dataset-Specific Challenges for T5 and NLI
 
-Example hypothesis:
+# OntoNotes
 
-The entity is a politician.
+## Challenges for T5
 
-Problem:
+- **Span dependency:**
+The model must correctly identify entity spans before classification.
 
-Many labels require many hypotheses.
 
-For example:
+## Challenges for NLI-based Approaches
 
-100 labels  
-→ 100 NLI inferences per entity
+- **Inefficient formulation:**
+With only 9 labels, NLI formulations (one hypothesis per label) are unnecessarily expensive.
 
-This significantly increases **computational cost**.
 
 ---
 
-# Preprocessing Strategies
+# FIGER
 
-## Entity Span Detection
+## Challenges for T5
 
-Example:
+- **Multi-label generation:**
+Entities often have multiple labels → T5 must generate sets of labels, not single outputs.
 
-[Barack Obama] visited [Berlin]
+- **Hierarchical labels:**
+Labels like /person/actor require structured understanding.
 
-First, the **entity spans** are identified.
 
----
-
-## Label Normalization
-
-Example:
-
-sports_team → sports team  
-film_actor → actor
-
-This simplifies **generative modeling**.
+- **Class imbalance:**
+Frequent labels dominate training → rare labels are harder to generate.
 
 ---
 
-## Splitting Hierarchical Labels
+## Challenges for NLI-based Approaches
 
-Example:
+- **Scalability problem:**
+128 labels → each entity requires many hypothesis checks.
 
-person/politician
+- **Label dependency ignored:**
+NLI treats labels independently, but FIGER labels are hierarchical and correlated.
 
-becomes:
+---
+
+# Ultra-Fine
+
+## Challenges for T5
+
+- **Extremely large label space (~1600+):**
+The model must generalize to many rare labels.
+
+- **Open vocabulary labels:**
+Labels are often natural language → increases generation difficulty.
+
+- **Long-tail distribution:**
+Many labels appear only a few times.
+
+---
+
+## Challenges for NLI-based Approaches
+
+- **Label ambiguity:**
+Some labels overlap semantically (e.g., musician, artist).
+
+---
+
+# Recommended Preprocessing Strategies
+
+## General Strategies
+
+1. ### Label Normalization
+
+**Convert labels into a consistent format:**
+
+- /person/actor → actor
+
+- film_actor → actor
+
+**Benefits:**
+
+- Reduces sparsity
+
+- Improves generation consistency
+
+2. ### Lowercasing and Cleaning
+
+- Convert all labels to lowercase
+
+- Remove special characters (/, _)
+
+## Dataset-Specific Strategies
+
+### OntoNotes
+
+- Extract one label per entity span
+
+**Map labels to natural language:**
+
+- PERSON → person
+
+- ORG → organization
+
+### FIGER
+- **Example Data:**
+
+Muddy Waters ['/person/musician', '/person/actor', '/person/artist', '/person']
+
+- **Split hierarchical labels:**
+
+/person/actor →
 
 person  
-politician
+actor
+
+**Limit label depth if needed**
+
+### Ultra-Fine
+
+- **Example Data:**
+
+They ['expert', 'scholar', 'scientist', 'person']
+
+
+- **Frequency filtering**
+
+Remove labels below a frequency threshold (e.g., <10 occurrences)
+
+- **Top-k label selection**
+
+Keep only the most relevant labels per mention
 
 ---
 
-## Handling Rare Labels
+## Strategies for T5
 
-Possible strategies:
+### Format output as:
 
-- Removing extremely rare labels  
-- Merging similar labels  
-- Applying few-shot learning techniques  
+**entity → label1, label2, label3**
+
+### Use:
+
+- sorted labels
+
+- limit max number of generated labels
 
 ---
 
-# Summary
+## Strategies for NLI
 
-The three datasets differ significantly in their complexity:
+### Template standardization:
 
-| Dataset | Granularity | Labels | Difficulty |
-|--------|-------------|-------|-------------|
-| OntoNotes | Coarse | ~18 | Low |
-| FIGER | Fine | ~100 | Medium |
-| Ultra-Fine | Very fine | Thousands | High |
+**Example:**
 
-As granularity increases, the challenges also grow:
+"The entity is a musician."
 
-- Multi-label classification  
-- Long-tail label distributions  
-- Context-dependent interpretation of entities  
 
-These characteristics create different requirements for **T5-based models** and **NLI-based approaches**.
+
 ---
 
 > Status: Work in progress (this repo will evolve as experiments and structure solidify!).
