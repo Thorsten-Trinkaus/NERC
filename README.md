@@ -16,134 +16,131 @@ We investigate **Named Entity Recognition & Classification (NERC)** under **incr
 al., ACL 2018)
 
 
-# NERC Dataset Analysis – OntoNotes, FIGER, and Ultra-Fine
+# Dataset Analysis: OntoNotes, FIGER, and Ultra-Fine
 
-This subproject analyzes three datasets used for **Named Entity Recognition and Classification (NERC)** and **Fine-Grained Entity Typing**.
+## Overview
 
-The goal is to better understand the **structure, complexity, and label distributions** of the datasets before training models such as **T5** or **NLI-based classifiers**.
+### Dataset Structure
+- [General Analysis](#general-analysis-and-overview)
+- [OntoNotes](#ontonotes-the-90-solution-hovy-et-al-naacl-2006)
+- [FIGER](#fine-grained-entity-recognition-figer-ling-and-weld-aaai-2012)
+- [Ultra-Fine](#ultra-fine-entity-typing-choi-et-al-acl-2018)
 
-Datasets analyzed:
+### Challenges for T5 and NLI
+- [T5](#t5)
+- [NLI](#nli)
 
-- OntoNotes (Hovy et al., NAACL 2006)
-- FIGER – Fine-Grained Entity Recognition (Ling & Weld, AAAI 2012)
-- Ultra-Fine Entity Typing (Choi et al., ACL 2018)
+### Recommended Preprocessing Strategies
+- [General Strategies](#general-strategies)
+- [Dataset-Specific Strategies](#dataset-specific-strategies)
 
 ---
 
-# Dataset Overview
+## Dataset Structure
+
+**Note:**  
+Since the three datasets differ significantly in structure, we first analyze each dataset individually.
+
+For Ultra-Fine, we split the dataset into:
+- **Ultra-Fine Crowdsourced (ds_fine_crowd)**
+- **Ultra-Fine Distantly Supervised (ds_fine_ds)**
+
+Due to their substantial differences, we effectively work with **four datasets** in total.
+
+---
+
+## General Analysis and Overview
 
 | Dataset | Task | Granularity | Multi-Label |
-|-------|------|-------------|-------------|
+|--------|------|------------|------------|
 | OntoNotes | Classical NER | Coarse | No |
 | FIGER | Fine-Grained Entity Typing | Fine | Yes |
 | Ultra-Fine | Ultra-Fine Entity Typing | Very Fine | Yes |
 
-These datasets represent **three increasing levels of entity typing complexity**.
+---
+
+### Dataset Size
+
+![Dataset Size](datasets/Plots/dataset_size.png)
+
+The datasets vary significantly in size.  
+**Ultra-Fine** and **FIGER** are substantially larger than **OntoNotes**, while **ds_fine_crowd** is much smaller than **ds_fine_ds**.
 
 ---
 
-# Dataset Size Comparison
+### Labels
 
-The datasets differ significantly in size.
+| Dataset | Unique Labels | Multi-Label |
+|--------|--------------|------------|
+| OntoNotes | 4 | No |
+| FIGER | ~100 | Yes |
+| Ultra-Fine | 10k+ | Yes |
 
+![Average Labels](datasets/Plots/avg_labels.png)
 
-| Dataset | diffrent Labels | Multi-Label |
-|---------|-------------|-------------|
-| OntoNotes | 9  | No |
-| FIGER | 128  | Yes |
-| Ultra-Fine | 1639 | Yes |
-
-FIGER contains the largest number of entity mentions, while OntoNotes is smaller but uses structured NER annotations.
-
----
-
-# Label Space Comparison
-
-The number of distinct labels varies strongly across datasets.
-
-
-
-Observations:
-
-- **OntoNotes** uses a small fixed label set
-- **FIGER** expands this to a larger fine-grained taxonomy
-- **Ultra-Fine** contains a very large and open-ended label space
-
-This increase in label space complexity significantly affects model difficulty.
+**ds_fine_crowd** has the highest number of labels per mention, closely followed by **FIGER**.  
+**OntoNotes** is strictly single-label, while **ds_fine_ds** also has relatively few labels per entity.
 
 ---
 
-# Labels per Mention
+![Mentions with no Label (%)](datasets/Plots/no_label_ratio.png)
 
-The number of labels assigned to each entity mention differs across datasets.
-
-## Average Labels per Mention
-
-![Average Labels](datasets/Plots/avg_labels_per_mention.png)
-
-Observations:
-
-- OntoNotes is **single-label**
-- FIGER introduces **multi-label classification**
-- Ultra-Fine contains **more descriptive multi-label annotations**
+Both **FIGER** and **OntoNotes** contain a portion of mentions without labels.
 
 ---
 
-## Maximum Labels per Mention
+![Multi-word Entity Ratio](datasets/Plots/multi_word_ratio.png)
 
-![Max Labels](datasets/Plots/max_labels_per_mention.png)
-
-Ultra-Fine occasionally assigns **many labels to a single entity**, reflecting the dataset's goal of capturing rich semantic descriptions.
+In **FIGER**, all entities are **single tokens**, whereas in the other datasets, a significant portion of entities consists of multiple words.
 
 ---
 
-# OntoNotes Dataset
+## OntoNotes: The 90% Solution (Hovy et al., NAACL 2006)
 
 OntoNotes is a benchmark dataset for **classical Named Entity Recognition (NER)**.
 
-### Example Labels
+### ds_onto
 
-- PERSON
+| Metric | Value |
+|--------|------|
+| Entities | 35089 |
+| Unique Labels | 4 |
+| Multi-word Entities | 12917 (36.81%) |
+| Avg Labels/Entity | 1.00 |
+| Max Labels/Entity | 1 |
+
+---
+
+### Labels
+
+- PER
 - LOC
 - ORG
+- MISC
 
-Example:
+OntoNotes contains only four labels and is strictly **single-label**, making it the dataset with the lowest granularity.
 
-| Entity | Label |
-|------|------|
-| Barack Obama | PERSON |
-| Apple | ORG |
-
-These labels are **coarse-grained** and mutually exclusive.
+![OntoNotes Top Labels](datasets/Plots/ds_onto_top_labels.png)
 
 ---
 
-## Label Distribution
+## Fine-Grained Entity Recognition (FIGER) (Ling and Weld, AAAI 2012)
 
-OntoNotes shows a strong **class imbalance**.
+FIGER extends classical NER to **fine-grained entity typing**. It is also the **largest dataset** used in this project.
 
-Most frequent classes include:
+### ds_figer
 
-- PERSON
-- ORG
-- GPE
-
-Rare classes include:
-
-- CITY
-- COUNTRY
-
-This imbalance can affect model performance.
-
-![OntoNotes Top Labels](datasets/Plots/ontonotes_top10_labels.png)
-
-Compared to FIGER and Ultra-Fine, OntoNotes has a **much more compact label distribution**.
+| Metric | Value |
+|--------|------|
+| Entities | 4,047,079 |
+| Unique Labels | 91 |
+| Multi-word Entities | 0 (0.00%) |
+| Avg Labels/Entity | 4.62 |
+| Max Labels/Entity | 25 |
 
 ---
 
-# FIGER Dataset
-
-FIGER extends classical NER to **fine-grained entity typing**.
+### Labels
 
 Instead of broad categories like *PERSON*, FIGER introduces hierarchical labels such as:
 
@@ -152,28 +149,56 @@ Instead of broad categories like *PERSON*, FIGER introduces hierarchical labels 
 - `/location/city`
 - `/organization/company`
 
+![FIGER Top Labels](datasets/Plots/ds_figer_top_labels.png)
 
-## Top Labels in FIGER
+![FIGER Label Distribution](datasets/Plots/ds_figer_labels_per_entity.png)
 
-The most frequent labels in the dataset are shown below.
-
-![FIGER Top Labels](datasets//Plots/figer_top10_labels.png)
-
-Common entity types include:
-
-- person
-- organization
-- location
-
-The dataset exhibits a **long-tail distribution**, where many labels occur only rarely.
+Most entities have between **1 and 5 labels**, although rare cases reach up to **25 labels**.
 
 ---
 
-# Ultra-Fine Entity Typing Dataset
+## Ultra-Fine Entity Typing (Choi et al., ACL 2018)
 
 The Ultra-Fine dataset pushes entity typing further by allowing **very specific semantic descriptions**.
 
-Examples of labels:
+---
+
+### Ultra-Fine Distantly Supervised (ds_fine_ds)
+
+| Metric | Value |
+|--------|------|
+| Entities | 3,152,711 |
+| Unique Labels | 4261 |
+| Multi-word Entities | 1,749,718 (55.50%) |
+| Avg Labels/Entity | 2.18 |
+| Max Labels/Entity | 11 |
+
+---
+
+### Ultra-Fine Crowdsourced (ds_fine_crowd)
+
+| Metric | Value |
+|--------|------|
+| Entities | 5994 |
+| Unique Labels | 2519 |
+| Multi-word Entities | 3000 (50.05%) |
+| Avg Labels/Entity | 5.39 |
+| Max Labels/Entity | 19 |
+
+---
+
+### Differences
+
+- **ds_fine_ds** is significantly larger than **ds_fine_crowd**
+- **ds_fine_ds** contains more total labels but fewer labels per entity on average
+
+---
+
+### Labels
+
+Labels are often **natural language descriptions** rather than fixed ontology entries.
+
+Examples:
 
 - person
 - musician
@@ -181,84 +206,85 @@ Examples of labels:
 - father
 - skyscraper
 
-Labels are often **natural language descriptions** instead of fixed ontology entries.
+![Ultra-Fine Crowdsourced Top Labels](datasets/Plots/ds_fine_crowd_top_labels.png)
+
+![Ultra-Fine Distantly Supervised Top Labels](datasets/Plots/ds_fine_ds_top_labels.png)
+
+Interresting how **location** in **fine_ds** is the Top Label, but in **fine_crowd** it is way less comon.
+
+![Ultra-Fine Crowd Label Distribution](datasets/Plots/ds_fine_crowd_labels_per_entity.png)
+
+![Ultra-Fine DS Label Distribution](datasets/Plots/ds_fine_ds_labels_per_entity.png)
 
 ---
 
-## Top Labels in Ultra-Fine
+# Challenges for T5 and NLI
 
-![Ultra-Fine Top Labels](datasets/Plots/ultrafine_top10_labels.png)
+## T5
 
-The label distribution shows a strong **long-tail behavior**.
+### [What is T5? (Wikipedia)](https://en.wikipedia.org/wiki/T5_(language_model)#Applications)
 
-Many labels appear only a few times.
+T5 (Text-to-Text Transfer Transformer) is a transformer-based model developed by Google that converts all NLP tasks into a text-to-text format.
 
 ---
 
+### OntoNotes
 
-# Dataset-Specific Challenges for T5 and NLI
-
-# OntoNotes
-
-## Challenges for T5
-
-- **Span dependency:**
+- **Span dependency:**  
 The model must correctly identify entity spans before classification.
 
+---
 
-## Challenges for NLI-based Approaches
+### FIGER
 
-- **Inefficient formulation:**
-With only 9 labels, NLI formulations (one hypothesis per label) are unnecessarily expensive.
+- **Multi-label generation:**  
+Entities often have multiple labels → requires generating label sets.
 
+- **Hierarchical labels:**  
+Labels require structured understanding.
+
+- **Class imbalance:**  
+Frequent labels dominate training.
 
 ---
 
-# FIGER
+### Ultra-Fine
 
-## Challenges for T5
+- **Extremely large label space:**  
+Thousands of labels → difficult generalization.
 
-- **Multi-label generation:**
-Entities often have multiple labels → T5 must generate sets of labels, not single outputs.
+- **Open vocabulary labels:**  
+Labels are natural language.
 
-- **Hierarchical labels:**
-Labels like /person/actor require structured understanding.
-
-
-- **Class imbalance:**
-Frequent labels dominate training → rare labels are harder to generate.
+- **Long-tail distribution:**  
+Many rare labels.
 
 ---
 
-## Challenges for NLI-based Approaches
+## NLI
 
-- **Scalability problem:**
-128 labels → each entity requires many hypothesis checks.
-
-- **Label dependency ignored:**
-NLI treats labels independently, but FIGER labels are hierarchical and correlated.
+### [What is NLI? (Wikipedia)](https://en.wikipedia.org/wiki/Textual_entailment)
 
 ---
 
-# Ultra-Fine
+### OntoNotes
 
-## Challenges for T5
-
-- **Extremely large label space (~1600+):**
-The model must generalize to many rare labels.
-
-- **Open vocabulary labels:**
-Labels are often natural language → increases generation difficulty.
-
-- **Long-tail distribution:**
-Many labels appear only a few times.
+- **Inefficient formulation:**  
+Too few labels for NLI to be efficient.
 
 ---
 
-## Challenges for NLI-based Approaches
+### FIGER
 
-- **Label ambiguity:**
-Some labels overlap semantically (e.g., musician, artist).
+- **Ignored label dependencies:**  
+Hierarchy is not modeled.
+
+---
+
+### Ultra-Fine
+
+- **Label ambiguity:**  
+Semantic overlap between labels.
 
 ---
 
@@ -266,93 +292,83 @@ Some labels overlap semantically (e.g., musician, artist).
 
 ## General Strategies
 
-1. ### Label Normalization
+### 1. Label Normalization
 
-**Convert labels into a consistent format:**
+Convert labels into a consistent format:
 
-- /person/actor → actor
+- `/person/actor` → actor  
+- `film_actor` → actor  
 
-- film_actor → actor
+---
 
-**Benefits:**
+### 2. Lowercasing and Cleaning
 
-- Reduces sparsity
+- Convert to lowercase  
+- Remove special characters (`/`, `_`)
 
-- Improves generation consistency
-
-2. ### Lowercasing and Cleaning
-
-- Convert all labels to lowercase
-
-- Remove special characters (/, _)
+---
 
 ## Dataset-Specific Strategies
 
 ### OntoNotes
 
-- Extract one label per entity span
+- Extract one label per entity span  
 
 **Map labels to natural language:**
 
-- PERSON → person
+- PERSON → person  
+- ORG → organization  
 
-- ORG → organization
+---
 
 ### FIGER
-- **Example Data:**
 
-Muddy Waters ['/person/musician', '/person/actor', '/person/artist', '/person']
+**Example:**
 
-- **Split hierarchical labels:**
+Muddy Waters → ['/person/musician', '/person/actor', '/person/artist']
 
-/person/actor →
+- Split hierarchical labels:
+  
+'/person/actor' → person, actor
 
-person  
-actor
+- Optionally limit hierarchy depth
 
-**Limit label depth if needed**
+---
 
 ### Ultra-Fine
 
-- **Example Data:**
+**Example:**
 
-They ['expert', 'scholar', 'scientist', 'person']
+They → ['expert', 'scholar', 'scientist', 'person']
 
+- Frequency filtering  
+- Remove rare labels (<10 occurrences)
 
-- **Frequency filtering**
-
-Remove labels below a frequency threshold (e.g., <10 occurrences)
-
-- **Top-k label selection**
-
-Keep only the most relevant labels per mention
+- Top-k selection  
+- Keep most relevant labels per mention
 
 ---
 
 ## Strategies for T5
 
-### Format output as:
+Format output as:
 
 **entity → label1, label2, label3**
 
-### Use:
-
-- sorted labels
-
-- limit max number of generated labels
+Use:
+- sorted labels  
+- limit number of generated labels  
 
 ---
 
 ## Strategies for NLI
 
-### Template standardization:
+### Template standardization
 
-**Example:**
+Example:
 
 "The entity is a musician."
-
-
-
 ---
+
 
 > Status: Work in progress (this repo will evolve as experiments and structure solidify!).
