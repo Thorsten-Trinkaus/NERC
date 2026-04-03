@@ -1,1 +1,19 @@
 .env
+datasets/spanbert
+
+# Local / tool state
+.codex
+.python-version
+__pycache__/
+*.pyc
+
+# Generated data
+datasets/spanbert_data/
+logs/
+
+# Large training artifacts
+results/spanbert_finetuned/
+
+# Keep small probing summaries, ignore bulky dumps
+results/spanbert_probing/*/validation/predictions.json
+results/spanbert_probing/*/test/predictions.json

@@ -1,0 +1,18 @@
+{
+  "precision_micro": 0.9732041049030786,
+  "recall_micro": 0.9726495726495726,
+  "f1_micro": 0.9729267597606155,
+  "precision_macro": 0.9720894098200534,
+  "recall_macro": 0.9733659650868245,
+  "f1_macro": 0.9727031715601453,
+  "split": "test",
+  "num_examples": 1755,
+  "threshold": 0.2,
+  "selection_metric": "f1_micro",
+  "threshold_search_enabled": false,
+  "avg_gold_labels_per_example": 1.0,
+  "avg_predicted_labels_per_example": 0.9994301994301994,
+  "logit_min": -9.936604499816895,
+  "logit_max": 6.689760684967041,
+  "avg_max_logit_per_example": 5.770878791809082
+}

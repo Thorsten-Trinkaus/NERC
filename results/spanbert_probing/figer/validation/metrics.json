@@ -1,0 +1,71 @@
+{
+  "precision_micro": 0.9542750528996617,
+  "recall_micro": 0.937448363743296,
+  "f1_micro": 0.945786872469294,
+  "precision_macro": 0.9053000921433187,
+  "recall_macro": 0.862635218881425,
+  "f1_macro": 0.8811254274197411,
+  "split": "validation",
+  "num_examples": 269029,
+  "threshold": 0.3,
+  "selection_metric": "f1_micro",
+  "threshold_search_enabled": true,
+  "avg_gold_labels_per_example": 2.3890249729156494,
+  "avg_predicted_labels_per_example": 2.34689940489687,
+  "logit_min": -34.75274658203125,
+  "logit_max": 15.820307731628418,
+  "avg_max_logit_per_example": 6.979550838470459,
+  "best_threshold_by_search": 0.3,
+  "threshold_search_top5": [
+    {
+      "precision_micro": 0.9542750528996617,
+      "recall_micro": 0.937448363743296,
+      "f1_micro": 0.945786872469294,
+      "precision_macro": 0.9053000921433187,
+      "recall_macro": 0.862635218881425,
+      "f1_macro": 0.8811254274197411,
+      "threshold": 0.3,
+      "avg_predicted_labels_per_example": 2.34689940489687
+    },
+    {
+      "precision_micro": 0.952245317031857,
+      "recall_micro": 0.9394087911164634,
+      "f1_micro": 0.9457835005521745,
+      "precision_macro": 0.9028463227007757,
+      "recall_macro": 0.8656594296321123,
+      "f1_macro": 0.8816956841270428,
+      "threshold": 0.2,
+      "avg_predicted_labels_per_example": 2.356820268446896
+    },
+    {
+      "precision_micro": 0.9532627266649492,
+      "recall_micro": 0.9384161302719548,
+      "f1_micro": 0.9457811676744362,
+      "precision_macro": 0.9036292683496392,
+      "recall_macro": 0.8637520402840642,
+      "f1_macro": 0.8809625849365265,
+      "threshold": 0.25,
+      "avg_predicted_labels_per_example": 2.3518170903508544
+    },
+    {
+      "precision_micro": 0.9562083957496478,
+      "recall_micro": 0.9355657311071591,
+      "f1_micro": 0.9457744390940569,
+      "precision_macro": 0.9083619573029527,
+      "recall_macro": 0.859852792974374,
+      "f1_macro": 0.8808857218975941,
+      "threshold": 0.4,
+      "avg_predicted_labels_per_example": 2.337450609413855
+    },
+    {
+      "precision_micro": 0.9511564887057838,
+      "recall_micro": 0.9404138991188968,
+      "f1_micro": 0.9457546893031079,
+      "precision_macro": 0.901227332218967,
+      "recall_macro": 0.8668136671430042,
+      "f1_macro": 0.8815863052213063,
+      "threshold": 0.15,
+      "avg_predicted_labels_per_example": 2.3620427537551714
+    }
+  ]
+}
