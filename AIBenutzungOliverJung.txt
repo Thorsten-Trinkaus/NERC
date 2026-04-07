@@ -1,0 +1,403 @@
+Ich habe in dem Projekt anfangs mit der kostenlosen Version von Chat GPT gearbeitet. Leider sind nicht alle Anfragen vorhanden, da ich unteranderem mich manchmal nicht angemeldet habe.
+Hier sind aber die noch vorhandenen Anfragen mit der konstenlosen Version.
+Ab dem 28.3. besitze ich die Bezahlversion und habe dann auf dem aktuellsten Modell gearbeitet. Hierbei fehlen leider dann aber auch noch ein paar Anfragen, da diese gelöscht wurden als ich mein Fenster neu geöffnet habe. Daher kann ich auch nicht 100% sagen, wo überall KI eingesetzt wurde.
+
+
+=== CHAT EXPORT: SpanBERT Projekt ===
+
+User:
+Ich möchte große Datensätze lokal nutzen ohne sie ins Git Repo zu pushen...
+
+Assistant:
+Empfiehlt .gitignore, lokale Datenordner, symlinks, etc.
+
+---
+
+User:
+Frage zu Git LFS und Datensätzen
+
+Assistant:
+Erklärt Git LFS Pointer vs echte Daten, zeigt Lösung mit lokalem Dataset Ordner.
+
+---
+
+User:
+Fehler mit protobuf Import
+
+Assistant:
+Erklärt Version-Konflikt, Lösung: protobuf Version anpassen.
+
+---
+
+User:
+BadGzipFile Fehler
+
+Assistant:
+Erklärt, dass Datei nur ein LFS Pointer ist → echte Daten nötig.
+
+---
+
+User:
+Speichern von Datensätzen
+
+Assistant:
+Zeigt Nutzung von HuggingFace Dataset.to_json()
+
+---
+
+User:
+Analyse von Datensätzen (Labels, Verteilungen, etc.)
+
+Assistant:
+Erstellt vollständiges Analyse-Skript inkl. Plots.
+
+---
+
+User:
+JSONDecodeError
+
+Assistant:
+Erklärt JSONL vs JSON und liefert korrekten Loader.
+
+---
+
+User:
+Unterschiedliche Label-Formate
+
+Assistant:
+Erstellt extract_labels Funktion für alle Datensätze.
+
+---
+
+User:
+OntoNotes Mapping fehlt
+
+Assistant:
+Liefert id2label Mapping + Fix für BIO Tags.
+
+---
+
+User:
+Rechner friert ein beim Laden
+
+Assistant:
+Erklärt RAM Problem → Streaming Lösung mit Generator.
+
+---
+
+User:
+Plots zu unübersichtlich
+
+Assistant:
+Begrenzt auf Top-N Labels + Vergleichsplots.
+
+---
+
+User:
+OntoNotes falsche Statistik
+
+Assistant:
+Erklärt Token vs Entity Problem → BIO Entity Extraction Fix.
+
+---
+
+User:
+Plots speichern Fehler
+
+Assistant:
+Zeigt plt.savefig() Lösung + Plot Ordner Setup.
+
+---
+
+User:
+FIGER hat zu viele Labels (~8000)
+
+Assistant:
+Erklärt hierarchische Labels + Normalisierung + Level-Reduktion.
+
+---
+
+User:
+README überarbeiten
+
+Assistant:
+Übersetzt vollständig ins Englische + fügt interne Links hinzu.
+
+---
+
+User:
+SpanBERT Training Setup
+
+Assistant:
+Erstellt komplette Pipeline:
+- preprocessing_spanbert.py
+- spanbert_fine_tuning.py
+
+---
+
+User:
+Fehler entity_name fehlt (FIGER)
+
+Assistant:
+Fix: Nutzung von start/end statt entity_name.
+
+---
+
+User:
+Chat als TXT exportieren
+
+Assistant:
+Dieser Export wurde erstellt.
+
+=== END ===
+
+
+
+andere Anfrage:
+
+Chat Summary - Git Large Files Issue
+
+User encountered git push errors (HTTP 408) due to very large dataset
+files committed into repository history.
+
+Key Findings: - Several files exceeded 1GB (JSON datasets) - Git history
+contained multiple large commits - .gitignore does not remove already
+committed files - GitHub limits (100MB/file) were exceeded
+
+Core Problem: Large dataset files (~3GB total) were included in Git
+history.
+
+Solutions Discussed: 1. git filter-repo to remove datasets from history
+2. Hard/soft reset explanations 3. Git LFS usage 4. Authentication
+issues (PAT vs password)
+
+Final Recommended Fix: - Remove .git directory - Reinitialize
+repository - Add datasets/ to .gitignore - Commit only code files - Push
+clean repository
+
+Key Commands: git rev-list –objects –all git filter-repo –path datasets
+–invert-paths git reset –soft HEAD~2 git reset –hard HEAD rm -rf .git
+
+Important Lessons: - Never commit large datasets to Git - Use external
+storage or dataset loaders - Git keeps full history unless explicitly
+cleaned
+
+Generated on: 2026-04-06 16:13:24.930000
+
+
+nochmal andere Anfrage:
+
+ChatGPT Conversation Export
+
+User:
+Ich habe hier 3 Datensätze, welche ich erstmal auf meinem Rechner kriegen will und dann will ich die Datensätze nach ihren Labels analysieren und die Häufigkeit dieser Labels. das sind die 3 Datensätze:
+OntoNotes: The 90% Solution (Hovy et al., NAACL 2006)
+Fine-grained entity recognition (FIGER) (Ling and Weld, AAAI 2012)
+Ultra-Fine Entity Typing (Choi et al., ACL 2018)
+
+Kannst du mir helfen die 3 Datensätze erstmal auf meinem rechner zu kriegen und dann ein Skript zu schreiben, mit welchem ich die Labels analysieren kann? Ich arbeite in einer 3er Gruppe und wir benutzen hauptsächlich jupyter notebooks.
+
+Assistant:
+Ja, ich kann dir dabei helfen.
+
+Wir gehen in 3 Schritten vor:
+1. Datasets herunterladen
+2. Einheitliches Format erstellen
+3. Labels analysieren
+
+OntoNotes ist lizenzpflichtig (LDC).
+FIGER kann über GitHub geladen werden.
+Ultra-Fine Entity Typing ist als JSON verfügbar.
+
+Beispiel Analyse-Code:
+
+import json
+from collections import Counter
+import pandas as pd
+
+def load_json_dataset(path):
+    data = []
+    with open(path) as f:
+        for line in f:
+            data.append(json.loads(line))
+    return data
+
+def extract_labels(dataset):
+    labels = []
+    for item in dataset:
+        if "labels" in item:
+            labels.extend(item["labels"])
+        elif "y_str" in item:
+            labels.extend(item["y_str"])
+    return labels
+
+def label_frequency(labels):
+    counter = Counter(labels)
+    df = pd.DataFrame(counter.items(), columns=["label", "frequency"])
+    return df.sort_values("frequency", ascending=False)
+
+User:
+Kannst du mir bitte den Chat mit dir als txt Datei ausgeben? ich brauche den für mein Projekt
+
+
+
+Und hier ist die Anfrage mit der bezahlversion:
+
+UNd wie genau füge ich diese Dateien jetzt hinzu?
+
+
+Im Hauptdokument genau an der gewünschten Stelle mit \input{...}.
+
+Beispiel in deiner Datei DatensetAnalyse.txt:
+
+\input{report_parts/introduction_oliver}
+\input{report_parts/dataset_analysis_oliver}
+\input{report_parts/spanbert_oliver}
+Wichtig:
+
+Pfad ist relativ zur Hauptdatei.
+Bei \input ohne .tex schreiben.
+Deine Hauptdatei hat schon diese 3 Zeilen drin, du musst sie nur stehen lassen.
+Wenn ein Teil nicht rein soll, einfach auskommentieren:
+
+% \input{report_parts/spanbert_oliver}
+Zum Kompilieren am besten Hauptdatei auf .tex umbenennen (falls dein Tool .txt nicht baut).
+
+
+Wie kann ich denn überhaupt in diesem Drecks progamm die Verschiedenen Sachen hinzufügen? es gibt nirgens ein Knopf mit sachen Hinzufügen oder hochlalden
+
+
+Du brauchst hier keinen Upload-Button. Bei LaTeX „hinzufügen“ heißt einfach: Datei im gleichen Ordner anlegen und per \input referenzieren.
+
+Kurz so gehst du vor:
+
+Hauptdatei öffnen: DatensetAnalyse.txt
+An gewünschter Stelle eine Zeile einfügen:
+\input{report_parts/introduction_oliver}
+Speichern und kompilieren.
+Wenn Kompilieren nicht geht, liegt’s sehr wahrscheinlich daran, dass die Hauptdatei .txt statt .tex heißt.
+Dann umbenennen auf z. B. DatensetAnalyse.tex und diese kompilieren.
+
+Wenn du willst, benenne ich sie dir jetzt direkt auf .tex um und passe alles sauber an.
+
+
+https://www.overleaf.com/project/69c839081bf6cdfaa18fe350
+
+Ich bin in dieser internetseite. Ich kann nichts öffnen und auch nichts hinufügen
+
+
+Das klingt nach Read-only / falschem Modus in Overleaf.
+
+Mach genau diese Checks:
+
+Prüfe oben rechts, ob du Edit-Rechte hast.
+Wenn da nur View/Read-only ist, kannst du nichts hinzufügen.
+
+Wenn read-only: eigene Kopie erstellen
+Menu -> Copy Project (oder Clone)
+Dann arbeitest du in deiner kopierten Version mit Schreibrechten.
+
+Dateibaum links einblenden
+Falls links nichts sichtbar ist: auf das Ordner/Datei-Icon links oben klicken.
+
+Datei hinzufügen
+Im Dateibaum oben auf Upload (Pfeil nach oben) oder Rechtsklick im Baum -> New File.
+
+In main.tex einfügen:
+
+\input{report_parts/introduction_oliver}
+\input{report_parts/dataset_analysis_oliver}
+\input{report_parts/spanbert_oliver}
+Wenn du willst, schreibe ich dir jetzt 1:1, wo diese drei Zeilen in deinem main.tex rein sollen (mit genauer Position).
+
+
+Wennich oben rechts auf das Auge drücke kommt nur der Viewingmodus. Die anderen kann ich nicht auswählen
+
+
+Dann hast du sehr wahrscheinlich keine Edit-Rechte für dieses Projekt.
+
+Wenn rechts oben nur das Auge nutzbar ist und Source/Visual Editor nicht anklickbar sind, ist es View-only.
+
+So kommst du raus:
+
+Menu öffnen.
+Copy Project / Clone Project auswählen.
+Die Kopie öffnen.
+In der Kopie solltest du editieren können und Dateien hinzufügen.
+Falls Copy Project auch nicht da ist:
+
+Projekt-Besitzer muss dich mit Can edit einladen
+oder
+du erstellst ein neues Projekt (New Project) und lädst deine Dateien dort hoch.
+Wenn du willst, gehen wir jetzt Schritt für Schritt live durch genau deinen Screen (1 Klick nach dem anderen).
+
+
+Ich habe innerhalb von results in spanbert in meinem REPO ergebnisse vom Training festgehalten. Kannst du diese noch ausführlicher in den Teil für Spanbert ausführen und integrijeren?
+
+
+
+Worked for 2m 1s
+Erledigt, ich habe den SpanBERT-Teil deutlich ausführlicher mit euren echten Ergebnisdateien integriert:
+
+Bearbeitet: spanbert_oliver.tex
+Neu enthalten:
+
+Pipeline + Trainingsvarianten (inkl. pos_weight bei Ultra-Fine)
+Validation-basierte Threshold-Auswahl pro Datensatz
+Erweiterte Ergebnistabelle mit P_micro, R_micro, F1_micro, F1_macro und Pred./Gold
+Datensatzweise Interpretation (OntoNotes, FIGER, Ultra-Fine)
+Zusätzliche Evidenz aus Logit-Statistiken/Threshold-Sensitivität
+Klares Summary mit nächsten sinnvollen Verbesserungen
+Wenn du möchtest, erweitere ich als Nächstes noch den Conclusion-Teil so, dass die SpanBERT-Erkenntnisse dort kurz, aber sauber zusammengefasst werden.
+
+
+Ich finde die Tabelle etwas schwer zu verstehen. Kannst du die etwas angenehmer machen, also nur die 3 modelle bezüglich
+ precision_micro | 0.9544 |
+| recall_micro | 0.9380 |
+| f1_micro | 0.9462 |
+| precision_macro | 0.9042 |
+| recall_macro | 0.8640 |
+| f1_macro | 0.8816 |
+| avg_gold_labels_per_example | 2.3877 |
+| avg_predicted_labels_per_example | 2.3466 |
+| threshold | 0.3 |
+vergleichen. Aber die einzelnen Metriken besser fürs menschliche Auge aufschreiben
+
+
+
+Worked for 35s
+Perfekt, ich habe die Tabelle genau so umgebaut, dass sie leichter lesbar ist:
+
+Bearbeitet: spanbert_oliver.tex
+Was jetzt besser ist:
+
+Nur Vergleich der drei Runs (OntoNotes, FIGER, Ultra-Fine).
+Metriken als Zeilen, Datensätze als Spalten.
+Voll ausgeschriebene Namen statt Kurzformen (Micro Precision, Macro F1, usw.).
+avg_gold_labels_per_example, avg_predicted_labels_per_example und threshold sind direkt enthalten.
+Wenn du möchtest, kann ich als letzten Feinschliff noch die Werte auf 3 Nachkommastellen runden (sieht in PDFs oft ruhiger aus).
+
+
+Kannst du die Datensatz Analyse auch noch etwas mehr an mein ursprüngliches README.md aus dem REPO machen? also das Hauptreadme
+
+
+
+Worked for 48s
+Ja, habe ich gemacht und stärker an euer Haupt-README angelehnt.
+
+Aktualisiert: dataset_analysis_oliver.tex
+
+Was ich angepasst habe:
+
+Struktur jetzt nahe am README:
+Dataset Structure
+General Overview
+Comparative Statistics
+Dataset-Specific Notes
+Implications for Modeling
+Ultra-Fine explizit als zwei Quellen (ds_fine_ds, ds_fine_crowd) erklärt.
+Kennzahlen und Kernaussagen aus dem README direkt übernommen (Größe, Labeldichte, Multi-word-Ratio).
+Ton in Report-Form gehalten statt reiner README-Listen.
+Wenn du willst, kann ich als nächsten kleinen Feinschliff noch 2-3 Sätze aus eurem README zur “Mentions with no label”-Beobachtung ergänzen, damit dieser Punkt auch explizit im Report steht.
+
+
