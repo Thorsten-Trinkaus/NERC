@@ -369,6 +369,3 @@ Example:
 
 "The entity is a musician."
 ---
-
-
-> Status: Work in progress (this repo will evolve as experiments and structure solidify!).
