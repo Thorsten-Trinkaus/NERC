@@ -6,6 +6,13 @@
 Course project for **Formale Semantik** (University of Heidelberg).
 We investigate **Named Entity Recognition & Classification (NERC)** under **increasing label granularity** (from coarse-grained up to ultra-fine entity typing).
 
+Most of our code was written and executed inside Jupyter Notebooks. The data we used and produced was too large to store it in the GitHub Repository, but they are stored in the corresponding last folder and do not need to be recreated. To run the notebooks (at least the T5 related notebook) we provide a requirements.txt.
+This file can be used via:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
 ## Datasets
 
 [OntoNotes: The 90% Solution](https://aclanthology.org/N06-2015/) (Hovy et al., NAACL 2006)
