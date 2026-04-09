@@ -1,0 +1,21 @@
+For my tasks I have worked with the documentations and general guides of the libraries, models etc.
+Below I have linked the exact documentations I used for my tasks:
+
+----------------------------
+PyTorch Documentation: 
+https://docs.pytorch.org/docs/stable/index.html
+----------------------------
+pandas:
+https://pandas.pydata.org/docs/
+
+For pandas I specifically used the guide on how to create and work with DataFrames.
+----------------------------
+scikit-learn:
+https://scikit-learn.org/stable/
+
+For sklearn I specifically used guides on how to create plots.
+----------------------------
+
+Apart from these 3 major documentations most of my searches were related to syntax and
+errors I have encountered to see if other users found a solution for said errors. 
+
